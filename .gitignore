@@ -1,0 +1,16 @@
+# Binaries
+**/x64/
+**.exe
+
+# Visual Studio files and folder
+.vs/
+
+# Generated file
+**.log
+**.json
+
+# DataSet
+**/DataSets/
+
+# Auto saves
+*.auto
