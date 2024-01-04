@@ -1,4 +1,3 @@
-#include <Core/Core.cuh>
 #include <Utils/Options.cuh>
 
 namespace SSSP

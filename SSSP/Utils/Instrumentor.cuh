@@ -34,7 +34,7 @@ namespace SSSP
 
         void BeginSession(const std::string& name, const std::string& filepath)
         {
-            File::CreateFileIfNotExist(filepath);
+            File::CreateFileEvenAlreadyExist(filepath);
             // Only one session can be run at a time
             if (currentSession) { EndSession(); }
             currentSession = new InstrumentationSession{ name };
@@ -110,7 +110,7 @@ namespace SSSP
         InstrumentationTimer(const c8* name)
             : name(name), stopped(false)
         {
-            startTimepoint = std::chrono::steady_clock::now();
+            Start();
         }
 
         ~InstrumentationTimer()
@@ -119,11 +119,34 @@ namespace SSSP
                 Stop();
         }
 
+        void PrintTimer(const std::string& funcName)
+        {
+            Update();
+            SSSP_LOG_DEBUG_NL("[{}] took {} ms.", funcName, elapsedTime.count() / 1000);
+        }
+
+        const c8* GetName() { return name; }
+        std::chrono::time_point<std::chrono::steady_clock> GetStartTimepoint() { return startTimepoint; }
+        bool IsStopped() { return stopped; }
+        std::chrono::steady_clock::time_point GetEndTimepoint() { return endTimepoint; }
+        FloatingPointMicroseconds GetHighResStart() { return highResStart; }
+        std::chrono::duration<long long, std::micro> GetElapsedTime() { return elapsedTime; }
+    private:
+        void Update()
+        {
+            endTimepoint = std::chrono::steady_clock::now();
+            highResStart = FloatingPointMicroseconds{ startTimepoint.time_since_epoch() };
+            elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(startTimepoint).time_since_epoch();
+        }
+
+        void Start()
+        {
+            startTimepoint = std::chrono::steady_clock::now();
+        }
+
         void Stop()
         {
-            auto endTimepoint = std::chrono::steady_clock::now();
-            auto highResStart = FloatingPointMicroseconds{ startTimepoint.time_since_epoch() };
-            auto elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(startTimepoint).time_since_epoch();
+            Update();
             Instrumentor::Get().WriteProfile({ name, highResStart, elapsedTime, std::this_thread::get_id() });
             stopped = true;
         }
@@ -131,5 +154,8 @@ namespace SSSP
         const c8* name;
         std::chrono::time_point<std::chrono::steady_clock> startTimepoint;
         bool stopped;
+        std::chrono::steady_clock::time_point endTimepoint;
+        FloatingPointMicroseconds highResStart;
+        std::chrono::duration<long long, std::micro> elapsedTime;
     };
 }

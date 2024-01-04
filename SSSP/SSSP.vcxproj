@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="Core\Common.cuh" />
     <ClInclude Include="Core\Core.cuh" />
+    <ClInclude Include="CPU.cuh" />
     <ClInclude Include="External\double-conversion\bignum-dtoa.h" />
     <ClInclude Include="External\double-conversion\bignum.h" />
     <ClInclude Include="External\double-conversion\cached-powers.h" />
@@ -101,6 +102,8 @@
     <ClInclude Include="External\double-conversion\string-to-double.h" />
     <ClInclude Include="External\double-conversion\strtod.h" />
     <ClInclude Include="External\double-conversion\utils.h" />
+    <ClInclude Include="GPU.cuh" />
+    <ClInclude Include="Hybrid.cuh" />
     <ClInclude Include="Utils\Args.cuh" />
     <ClInclude Include="Utils\DataGenerator.cuh" />
     <ClInclude Include="Utils\Debug.cuh" />

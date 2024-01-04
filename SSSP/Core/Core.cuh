@@ -15,6 +15,8 @@
 
 #define SSSP_PROFILE_ENABLED 1
 
+#define MAX_DIST 6000
+
 // enable log
 #include <Utils/Logger.cuh>
 // Core log macros
@@ -207,6 +209,7 @@
 
 #if SSSP_PROFILE_ENABLED
 #include <Utils/Instrumentor.cuh>
+#include <Utils/Debug.cuh>
 #define EMPTY_PROFILE \
 	do {			\
 	} while (false);
@@ -221,10 +224,16 @@
 #define SSSP_PROFILE_END_SESSION() ::SSSP::Instrumentor::Get().EndSession()
 #define SSSP_PROFILE_SCOPE(name) ::SSSP::InstrumentationTimer timer##__LINE__(name)
 #define SSSP_PROFILE_FUNCTION()  SSSP_PROFILE_SCOPE(SSSP_PROFILE_FUNC_SIG)
+#define SSSP_PROFILE_PRINT_FUNCTION(name, func)         \
+        ::SSSP::InstrumentationTimer timer(name);       \
+        func;                                           \
+        timer.PrintTimer(name);                             
+        
 #else
 #define SSSP_PROFILE_BEGIN_SESSION(name, filepath) EMPTY_PROFILE
 #define SSSP_PROFILE_END_SESSION() EMPTY_PROFILE
 #define SSSP_PROFILE_SCOPE(name) EMPTY_PROFILE
+SSSP_PROFILE_PRINT_FUNCTION(name, func) EMPTY_PROFILE
 #define SSSP_PROFILE_FUNCTION() EMPTY_PROFILE
 #endif
 

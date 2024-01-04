@@ -43,7 +43,40 @@ namespace SSSP
 			}
 		}
 
-		static std::string ReadFromFile(const std::string& filePath) 
+		static void CreateFileEvenAlreadyExist(const std::string& filePath)
+		{
+			std::ifstream fileStream(filePath);
+			if (!fileStream.is_open())
+			{
+				std::ofstream newFile(filePath, std::ios::trunc); // Use std::ios::trunc to clear content if the file exists
+				if (newFile.is_open())
+				{
+					std::cout << "File created: " << filePath << std::endl;
+					newFile.close();
+				}
+				else
+				{
+					std::cerr << "Error: Could not create the file." << std::endl;
+				}
+			}
+			else
+			{
+				fileStream.close();
+				std::ofstream existingFile(filePath, std::ios::trunc); // Open existing file and clear content
+				if (existingFile.is_open())
+				{
+					std::cout << "Cleard existing file content and write: " << filePath << std::endl;
+					existingFile.close();
+				}
+				else
+				{
+					std::cerr << "Error: Could not clear content of the existing file." << std::endl;
+				}
+			}
+		}
+
+
+		static std::string ReadDataFromFile(const std::string& filePath) 
 		{
 			std::ifstream fileStream(filePath);
 			std::string fileContent;
@@ -51,6 +84,7 @@ namespace SSSP
 			if (fileStream.is_open()) 
 			{
 				std::string line;
+
 				while (std::getline(fileStream, line)) 
 				{
 					fileContent += line + "\n";
