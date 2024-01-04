@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Core/Core.cuh>
 
 namespace SSSP

@@ -80,16 +80,16 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="Main.cu" />
+    <CudaCompile Include="Core\Main.cu" />
     <CudaCompile Include="Utils\Args.cu" />
-    <CudaCompile Include="Graph.cu" />
+    <CudaCompile Include="Utils\Graph.cu" />
     <CudaCompile Include="Utils\Logger.cu" />
     <CudaCompile Include="Utils\Print.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Common.cuh" />
     <ClInclude Include="Core\Core.cuh" />
-    <ClInclude Include="CPU.cuh" />
+    <ClInclude Include="Core\CPU.cuh" />
     <ClInclude Include="External\double-conversion\bignum-dtoa.h" />
     <ClInclude Include="External\double-conversion\bignum.h" />
     <ClInclude Include="External\double-conversion\cached-powers.h" />
@@ -102,15 +102,14 @@
     <ClInclude Include="External\double-conversion\string-to-double.h" />
     <ClInclude Include="External\double-conversion\strtod.h" />
     <ClInclude Include="External\double-conversion\utils.h" />
-    <ClInclude Include="GPU.cuh" />
-    <ClInclude Include="Hybrid.cuh" />
     <ClInclude Include="Utils\Args.cuh" />
     <ClInclude Include="Utils\DataGenerator.cuh" />
     <ClInclude Include="Utils\Debug.cuh" />
     <ClInclude Include="Utils\Exception.cuh" />
-    <ClInclude Include="Graph.cuh" />
+    <ClInclude Include="Utils\Graph.cuh" />
     <ClInclude Include="Utils\File.cuh" />
     <ClInclude Include="Utils\Logger.cuh" />
+    <ClInclude Include="Utils\Memory.cuh" />
     <ClInclude Include="Utils\Numeric.cuh" />
     <ClInclude Include="Utils\Options.cuh" />
     <ClInclude Include="Utils\Print.cuh" />

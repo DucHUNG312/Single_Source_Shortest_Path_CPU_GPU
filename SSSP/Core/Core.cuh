@@ -15,7 +15,7 @@
 
 #define SSSP_PROFILE_ENABLED 1
 
-#define MAX_DIST 6000
+#define MAX_DIST std::numeric_limits<u32>::max()
 
 // enable log
 #include <Utils/Logger.cuh>
@@ -207,6 +207,33 @@
 #define SSSP_CHECK_LE(a, b) EMPTY_CHECK
 #endif // SSSP_ENABLE_CHECK
 
+#ifndef SSSP_STR
+#define SSSP_STR(x) #x
+#define SSSP_MAKE_STR(x) STR(x)
+#endif // !SSSP_STR
+
+#ifndef SSSP_MAX_RECURSION
+#define SSSP_MAX_RECURSION 100
+#endif // SSSP_MAX_RECURSION
+
+#ifndef BIT
+#define BIT(x) (1 << x)
+#endif // !BIT
+
+#ifndef SSSP_SHIFT_LEFT
+#define SSSP_SHIFT_LEFT(x) (std::size(1) << x)
+#endif // 
+
+#ifndef SSSP_SHIFT_RIGHT
+#define SSSP_SHIFT_RIGHT(x) (std::size(1) >> x)
+#endif // !SSSP_SHIFT_RIGHT
+
+#ifndef SSSP_CONCAT
+#define SSSP_CONCAT_HELPER(x, y) x##y
+#define SSSP_CONCAT(x, y) SSSP_CONCAT_HELPER(x, y)
+#endif // SSSP_SSSP_CONCAT
+
+
 #if SSSP_PROFILE_ENABLED
 #include <Utils/Instrumentor.cuh>
 #include <Utils/Debug.cuh>
@@ -224,10 +251,14 @@
 #define SSSP_PROFILE_END_SESSION() ::SSSP::Instrumentor::Get().EndSession()
 #define SSSP_PROFILE_SCOPE(name) ::SSSP::InstrumentationTimer timer##__LINE__(name)
 #define SSSP_PROFILE_FUNCTION()  SSSP_PROFILE_SCOPE(SSSP_PROFILE_FUNC_SIG)
-#define SSSP_PROFILE_PRINT_FUNCTION(name, func)         \
-        ::SSSP::InstrumentationTimer timer(name);       \
-        func;                                           \
-        timer.PrintTimer(name);                             
+#define SSSP_PROFILE_PRINT_FUNCTION(name, func)                                                                                     \
+    do {                                                                                                                            \
+        static i32 unique_counter_##__COUNTER__ = 0;                                                                                \
+        ::SSSP::InstrumentationTimer timer_##__COUNTER__(name);                                                                     \
+        unique_counter_##__COUNTER__++;                                                                                             \
+        func;                                                                                                                       \
+        timer_##__COUNTER__.PrintTimer(name);                                                                                       \
+    } while(0)                           
         
 #else
 #define SSSP_PROFILE_BEGIN_SESSION(name, filepath) EMPTY_PROFILE
@@ -235,7 +266,7 @@
 #define SSSP_PROFILE_SCOPE(name) EMPTY_PROFILE
 SSSP_PROFILE_PRINT_FUNCTION(name, func) EMPTY_PROFILE
 #define SSSP_PROFILE_FUNCTION() EMPTY_PROFILE
-#endif
+#endif      
 
 // Math utils
 #include <Utils/Numeric.cuh>
@@ -290,26 +321,5 @@ namespace SSSP
 }
 #define SSSP_UNUSED_VARIABLE(var) ::SSSP::Internal::ignore_unused_variable(var);
 #define SSSP_ARRAYSIZE(array) (sizeof(::SSSP::Internal::ArraySizeHelper(array)))
-
-#ifndef SSSP_STR
-#define SSSP_STR(x) #x
-#define SSSP_MAKE_STR(x) STR(x)
-#endif // !SSSP_STR
-
-#ifndef SSSP_MAX_RECURSION
-#define SSSP_MAX_RECURSION 100
-#endif // SSSP_MAX_RECURSION
-
-#ifndef BIT
-#define BIT(x) (1 << x)
-#endif // !BIT
-
-#ifndef SSSP_SHIFT_LEFT
-#define SSSP_SHIFT_LEFT(x) (std::size(1) << x)
-#endif // 
-
-#ifndef SSSP_SHIFT_RIGHT
-#define SSSP_SHIFT_RIGHT(x) (std::size(1) >> x)
-#endif // !SSSP_SHIFT_RIGHT
 
 

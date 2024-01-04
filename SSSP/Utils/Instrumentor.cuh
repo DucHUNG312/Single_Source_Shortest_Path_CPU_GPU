@@ -1,5 +1,7 @@
 /// This class is use for output json profiler file to use in chrome://tracing
 
+#pragma once
+
 #include <Utils/File.cuh>
 
 namespace SSSP

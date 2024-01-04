@@ -83,7 +83,7 @@ public:
 
 		for (size_t i = minVertex; i <= maxVertex; i++)
 		{
-			i32 iter = rand.GenerateInt(0, maxConnection);
+			i32 iter = rand.GenerateInt(1, maxConnection);
 
 			for (size_t j = 0; j < iter; j++)
 			{
@@ -105,5 +105,5 @@ public:
 
 i32 main()
 {
-	DataGenerator::Generator(0, 1000000, "E://CPUGPU//DataSets//data1.txt");
+	DataGenerator::Generator(0, 500000, "E://CPUGPU//DataSets//data4.txt");
 }

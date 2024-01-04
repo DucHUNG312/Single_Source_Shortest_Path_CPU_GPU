@@ -10,6 +10,6 @@ namespace SSSP
 		bool gpu = true;
 		bool hybrid = false;
 		i32 numThreadOpenMP = 8;
-		std::string dataFile = "E:\\CPUGPU\\DataSets\\simpleGraph.txt"; /// TODO: Set default data path at DataSets folder!
+		std::string dataFile = "E:\\CPUGPU\\DataSets\\data2.txt"; /// TODO: Set default data path at DataSets folder!
 	};
 }

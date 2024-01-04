@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef SSSP_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif // SSSP_PLATFORM_WINDOWS

@@ -1,4 +1,4 @@
-#include <Graph.cuh>
+#include <Utils/Graph.cuh>
 
 namespace SSSP
 {
