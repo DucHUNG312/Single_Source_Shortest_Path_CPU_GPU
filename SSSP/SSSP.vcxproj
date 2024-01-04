@@ -90,6 +90,8 @@
     <ClInclude Include="Core\Common.cuh" />
     <ClInclude Include="Core\Core.cuh" />
     <ClInclude Include="Core\CPU.cuh" />
+    <ClInclude Include="Core\GPU.cuh" />
+    <ClInclude Include="Core\Hybrid.cuh" />
     <ClInclude Include="External\double-conversion\bignum-dtoa.h" />
     <ClInclude Include="External\double-conversion\bignum.h" />
     <ClInclude Include="External\double-conversion\cached-powers.h" />

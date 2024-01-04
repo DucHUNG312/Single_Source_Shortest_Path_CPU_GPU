@@ -12,7 +12,7 @@ namespace SSSP
 		u32 weight;
 	};
 
-    class Graph 
+    class Graph
     {
     public:
         Graph(const std::string& graphFilePath);

@@ -30,24 +30,28 @@ namespace SSSP
 			delete[] p;
 		}
 
-		static T* AllocateCudaMemory(std::size_t n)
+		static T* AllocateDeviceMemory(std::size_t n)
 		{
 			if (n > std::numeric_limits<std::size_t>::max() / sizeof(T))
 				throw std::bad_array_new_length();
 
 			T* deviceMemory = nullptr;
-			CHECK_CUDA_ERROR(cudaMalloc(&deviceMemory, n * sizeof(T)));
-			auto dataDevice = SharedPtr<T>(deviceMemory, [&](T* ptr) { cudaFree(ptr); });
-			return dataDevice.get();
+			CHECK_CUDA_ERROR(cudaMalloc((void**)&deviceMemory, n * sizeof(T)));
+			return deviceMemory;
+		}
+
+		static void DeallocateDeviceMemory(T* p)
+		{
+			CHECK_CUDA_ERROR(cudaFree(p));
 		}
 
 		static void AllocateMemoryIfNotAllocated(std::size_t n)
 		{
 			AllocateHostMemory(n);
-			AllocateCudaMemory(n);
+			AllocateDeviceMemory(n);
 		}
 
-		static void CopyHostToDevice(T* dataHost, T* dataDevice, std::size_t n)
+		static void CopyHostToDevice(T* dataDevice, T* dataHost, std::size_t n)
 		{
 			CHECK_CUDA_ERROR(cudaMemcpy(dataDevice, dataHost, n * sizeof(T), cudaMemcpyHostToDevice));
 		}

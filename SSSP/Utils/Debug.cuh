@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Utils/Options.cuh>
+#include <Utils/Exception.cuh>
 
 namespace SSSP
 {
@@ -21,14 +22,6 @@ namespace SSSP
             for (i32 i = 0; i < size; i++) 
             {
                 SSSP_LOG_DEBUG_NL("dist[{}]: {}", i, dist[i]);
-            }
-        }
-
-        SSSP_FORCE_INLINE void PrintProcessed(bool* processed, u32 size) 
-        {
-            for (i32 i = 0; i < size; i++) 
-            {
-                SSSP_LOG_DEBUG_NL("processed[{}]: {}", i, processed[i]);
             }
         }
 
@@ -57,19 +50,38 @@ namespace SSSP
             if (diffCount == 0) 
             {
                 SSSP_LOG_TRACE_NL("Good! Short path of each node in the two 2 is the same:");
-                for (i32 i = 0; i < numNodes; i++) 
+#ifdef SSSP_DEBUG
+                for (i32 i = 0; i < numNodes; i++)
                 {
                     SSSP_LOG_TRACE("{}, ", dist1[i]);
                 }
+#endif // SSSP_DEBUG
             }
             else 
             {
                 SSSP_LOG_ERROR_NL("{} of {} does not match: ", diffCount, numNodes);
-                for (i32 i = 0; i < nodesId.size(); i++) 
+#ifdef SSSP_DEBUG
+                for (i32 i = 0; i < nodesId.size(); i++)
                 {
                     SSSP_LOG_ERROR("{}, ", nodesId[i]);
                 }
-                SSSP_LOG_ERROR_NL(" does not match.");
+#endif // SSSP_DEBUG
+            }
+        }
+
+        SSSP_FORCE_INLINE void PrintDeviceInfo()
+        {
+            i32 nDevices;
+            CHECK_CUDA_ERROR(cudaGetDeviceCount(&nDevices));
+            for (i32 i = 0; i < nDevices; i++)
+            {
+                cudaDeviceProp prop;
+                CHECK_CUDA_ERROR(cudaGetDeviceProperties(&prop, i));
+                SSSP_LOG_INFO_NL("Device name: {}", prop.name);
+                SSSP_LOG_INFO_NL("Memory Clock Rate (KHz): {}", prop.memoryClockRate);
+                SSSP_LOG_INFO_NL("Memory Bus Width (bits): {}", prop.memoryBusWidth);
+                SSSP_LOG_INFO_NL("Peak Memory Bandwidth (GB/s): {}", 2.0 * prop.memoryClockRate * (prop.memoryBusWidth / 8) / 1.0e6);
+                SSSP_LOG_INFO_NL();
             }
         }
 	}

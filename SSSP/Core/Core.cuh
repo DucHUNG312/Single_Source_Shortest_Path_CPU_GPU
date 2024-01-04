@@ -15,7 +15,7 @@
 
 #define SSSP_PROFILE_ENABLED 1
 
-#define MAX_DIST std::numeric_limits<u32>::max()
+#define MAX_DIST 10e6
 
 // enable log
 #include <Utils/Logger.cuh>
@@ -266,7 +266,14 @@
 #define SSSP_PROFILE_SCOPE(name) EMPTY_PROFILE
 SSSP_PROFILE_PRINT_FUNCTION(name, func) EMPTY_PROFILE
 #define SSSP_PROFILE_FUNCTION() EMPTY_PROFILE
-#endif      
+#endif
+
+// Debug
+#define SSSP_PRINT_DEVICE_STATS ::SSSP::Debug::PrintDeviceInfo()
+#define SSSP_PRINT_OPTIONS(options) ::SSSP::Debug::PrintOptions(options)
+#define SSSP_PRINT_DIST(dist, size) ::SSSP::Debug::PrintDist(dist, size)
+#define SSSP_PRINT_PRENODE(preNode, size) ::SSSP::Debug::PrintPreNode(preNode, size)
+#define SSSP_COMPARE_RESULT(dist1, dist2, numNodes) ::SSSP::Debug::CompareResult(dist1, dist2, numNodes)
 
 // Math utils
 #include <Utils/Numeric.cuh>
