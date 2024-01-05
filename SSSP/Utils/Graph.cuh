@@ -19,17 +19,11 @@ namespace SSSP
         void ReadGraph();
         void PrintGraph();
 
-        std::string GetGraphFilePath() { return graphFilePath; }
-        u32 GetNumNodes() { return numNodes; }
-        u32 GetNumEdges() { return numEdges; }
-        u32 GetDefaultSource() { return defaultSource; }
-        bool HasZero() { return hasZero; }
-        std::vector<Edge> GetEdges() { return edges; }
-    private:
+    public:
         std::string graphFilePath;
         u32 numNodes;
         u32 numEdges;
-        u32 defaultSource;
+        u32 defaultSource = 0;
         bool hasZero;
         std::vector<Edge> edges;
     };

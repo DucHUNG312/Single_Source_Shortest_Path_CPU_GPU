@@ -275,12 +275,13 @@ Options:
 		}
 
 		// Print banner
-#ifdef SSSP_DEBUG_BUILD
-		SSSP_LOG_INFO_NL("*** RUNNING DEBUG BUILD ***\n");
-#endif
 		SSSP_LOG_INFO_NL("Copyright (c)2023 Le Vu Duc Hung.");
 		SSSP_LOG_INFO_NL("The source code is covered by the MIT License.");
 		SSSP_LOG_INFO_NL("See the file LICENSE.txt for the conditions of the license.");
+#ifdef SSSP_DEBUG_BUILD
+		SSSP_LOG_INFO_NL();
+		SSSP_LOG_INFO_NL("*** RUNNING DEBUG BUILD ***\n");
+#endif
 		fflush(stdout);
 
 		// Check validity of provided arguments

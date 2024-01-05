@@ -36,7 +36,7 @@ namespace SSSP
 				throw std::bad_array_new_length();
 
 			T* deviceMemory = nullptr;
-			CHECK_CUDA_ERROR(cudaMalloc((void**)&deviceMemory, n * sizeof(T)));
+			CHECK_CUDA_ERROR(cudaMalloc(&deviceMemory, n * sizeof(T)));
 			return deviceMemory;
 		}
 

@@ -39,10 +39,10 @@ namespace SSSP
         }
     }
 
-    SSSP_FORCE_INLINE u32* SSSP_GPU_CUDA(SharedPtr<Graph> graph, i32 source, const Options& options)
+    SSSP_FORCE_INLINE u32* SSSP_GPU_CUDA(Graph* graph, i32 source, const Options& options)
     {
-        i32 numNodes = graph->GetNumNodes();
-        i32 numEdges = graph->GetNumEdges();
+        i32 numNodes = graph->numNodes;
+        i32 numEdges = graph->numEdges;
 
         // Allocate on CPU
         u32* dist = Allocator<u32>::AllocateHostMemory(numNodes);
@@ -64,7 +64,7 @@ namespace SSSP
 #pragma omp parallel for shared(dist, preNode, edgesSource, edgesEnd, edgesWeight) default(none) schedule(static)
         for (i32 i = 0; i < numEdges; i++)
         {
-            Edge edge = graph->GetEdges().at(i);
+            Edge edge = graph->edges.at(i);
             edgesSource[i] = edge.source;
             edgesEnd[i] = edge.end;
             edgesWeight[i] = edge.weight;

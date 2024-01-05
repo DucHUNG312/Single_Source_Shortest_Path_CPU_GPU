@@ -49,14 +49,11 @@ namespace SSSP
 			}
 
 			// graph[start][end] = weight;
-			if (newEdge.source == 0) 
+			if (newEdge.source == 0 || newEdge.end == 0)
 			{
 				hasZero = true;
 			}
-			if (newEdge.end == 0) 
-			{
-				hasZero = true;
-			}
+
 			if (maxNodeNumber < newEdge.source) 
 			{
 				maxNodeNumber = newEdge.source;

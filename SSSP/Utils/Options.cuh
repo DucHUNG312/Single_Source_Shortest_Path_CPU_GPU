@@ -4,13 +4,15 @@
 
 namespace SSSP
 {
+	const static std::string s_RootPath = "E:\\CPUGPU\\"; /// TODO: Automate this
+
 	struct Options
 	{
 		bool cpu = true;
 		bool gpu = true;
 		bool hybrid = false;
 		i32 numThreadOpenMP = 8;
-		std::string dataFile = "E:\\CPUGPU\\DataSets\\data2.txt"; /// TODO: Set default data path at root project folder!
-		std::string chromeTracingFile = "E:\\CPUGPU\\SSSP\\SSSP.json"; 
+		std::string dataFile = s_RootPath + "DataSets\\testGraph.txt"; 
+		std::string chromeTracingFile = s_RootPath + "SSSP\\SSSP.json";
 	};
 }

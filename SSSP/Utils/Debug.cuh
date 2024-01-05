@@ -49,7 +49,7 @@ namespace SSSP
 
             if (diffCount == 0) 
             {
-                SSSP_LOG_TRACE_NL("Good! Short path of each node in the two 2 is the same:");
+                SSSP_LOG_INFO_NL("Good! Short path of each node in the two 2 is the same:");
 #ifdef SSSP_DEBUG
                 for (i32 i = 0; i < numNodes; i++)
                 {

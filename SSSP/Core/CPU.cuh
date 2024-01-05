@@ -7,10 +7,10 @@
 
 namespace SSSP
 {
-    SSSP_FORCE_INLINE u32* SSSP_CPU_Serial(SharedPtr<Graph> graph, i32 source, const Options& options)
+    SSSP_FORCE_INLINE u32* SSSP_CPU_Serial(Graph* graph, i32 source, const Options& options)
     {
-        i32 numNodes = graph->GetNumNodes();
-        i32 numEdges = graph->GetNumEdges();
+        i32 numNodes = graph->numNodes;
+        i32 numEdges = graph->numEdges;
 
         u32* dist = Allocator<u32>::AllocateHostMemory(numNodes);
         u32* preNode = Allocator<u32>::AllocateHostMemory(numNodes);
@@ -26,7 +26,7 @@ namespace SSSP
 
         for (i32 i = 0; i < numEdges; i++) 
         {
-            Edge edge = graph->GetEdges().at(i);
+            Edge edge = graph->edges.at(i);
             if (edge.source == source) 
             {
                 if (edge.weight < dist[edge.end])
@@ -52,7 +52,7 @@ namespace SSSP
 
             for (i32 i = 0; i < numEdges; i++) 
             {
-                Edge edge = graph->GetEdges().at(i);
+                Edge edge = graph->edges.at(i);
                 // Update its neighbor
                 u32 source = edge.source;
                 u32 end = edge.end;
@@ -77,10 +77,10 @@ namespace SSSP
         return dist;
     }
 
-    SSSP_FORCE_INLINE u32* SSSP_CPU_Parallel(SharedPtr<Graph> graph, i32 source, const Options& options)
+    SSSP_FORCE_INLINE u32* SSSP_CPU_Parallel(Graph* graph, i32 source, const Options& options)
     {
-        i32 numNodes = graph->GetNumNodes();
-        i32 numEdges = graph->GetNumEdges();
+        i32 numNodes = graph->numNodes;
+        i32 numEdges = graph->numEdges;
 
         u32* dist = Allocator<u32>::AllocateHostMemory(numNodes);
         u32* preNode = Allocator<u32>::AllocateHostMemory(numNodes);
@@ -101,7 +101,7 @@ namespace SSSP
 #pragma omp parallel for shared(dist, preNode, edgesSource, edgesEnd, edgesWeight) default(none) schedule(static)
         for (i32 i = 0; i < numEdges; i++) 
         {
-            Edge edge = graph->GetEdges().at(i);
+            Edge edge = graph->edges.at(i);
             edgesSource[i] = edge.source;
             edgesEnd[i] = edge.end;
             edgesWeight[i] = edge.weight;
@@ -172,7 +172,7 @@ namespace SSSP
         Allocator<u32>::DeallocateHostMemory(edgesWeight);
 
         return dist;
-    } 
+    }
 }
 
 
