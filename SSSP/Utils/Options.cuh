@@ -5,6 +5,7 @@
 namespace SSSP
 {
 	const static std::string s_RootPath = "E:\\CPUGPU\\"; /// TODO: Automate this
+	const static std::string chromeTracingFile = s_RootPath + "SSSP\\SSSP.json";
 
 	struct Options
 	{

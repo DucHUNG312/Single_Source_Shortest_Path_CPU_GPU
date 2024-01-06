@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Utils/Options.cuh>
-#include <Utils/Exception.cuh>
 
 namespace SSSP
 {
@@ -33,10 +32,12 @@ namespace SSSP
             }
         }
 
-        SSSP_FORCE_INLINE void CompareResult(u32* dist1, u32* dist2, u32 numNodes) 
+        SSSP_FORCE_INLINE void CompareResult(u32* dist1, u32* dist2, u32* dist3, u32 numNodes) 
         {
             u32 diffCount = 0;
+            u32 diffCount2 = 0;
             std::vector<i32> nodesId;
+            std::vector<i32> nodesId2;
 
             for (i32 i = 0; i < numNodes; i++) 
             {
@@ -47,10 +48,18 @@ namespace SSSP
                 }
             }
 
-            if (diffCount == 0) 
+            for (i32 i = 0; i < numNodes; i++)
             {
-                SSSP_LOG_INFO_NL("Good! Short path of each node in the two 2 is the same:");
-#ifdef SSSP_DEBUG
+                if (dist1[i] != dist3[i])
+                {
+                    diffCount2++;
+                }
+            }
+
+            if (diffCount == 0 && diffCount2 == 0)
+            {
+                SSSP_LOG_INFO_NL("Good! Shortest path of each node in the 3 path are the same:");
+#if SSSP_DEBUG
                 for (i32 i = 0; i < numNodes; i++)
                 {
                     SSSP_LOG_TRACE("{}, ", dist1[i]);
@@ -59,8 +68,9 @@ namespace SSSP
             }
             else 
             {
-                SSSP_LOG_ERROR_NL("{} of {} does not match: ", diffCount, numNodes);
-#ifdef SSSP_DEBUG
+                SSSP_LOG_ERROR_NL("(dist 1, dist 2): {} does not match: ", diffCount);
+                SSSP_LOG_ERROR_NL("(dist 1, dist 3): {} does not match: ", diffCount2);
+#if SSSP_DEBUG
                 for (i32 i = 0; i < nodesId.size(); i++)
                 {
                     SSSP_LOG_ERROR("{}, ", nodesId[i]);
@@ -83,6 +93,49 @@ namespace SSSP
                 SSSP_LOG_INFO_NL("Peak Memory Bandwidth (GB/s): {}", 2.0 * prop.memoryClockRate * (prop.memoryBusWidth / 8) / 1.0e6);
                 SSSP_LOG_INFO_NL();
             }
+        }
+
+        SSSP_FORCE_INLINE std::string ToUpperCase(const std::string& str)
+        {
+            std::string result = str;
+            std::locale loc;
+
+            for (char& c : result) 
+            {
+                c = std::toupper(c, loc);
+            }
+
+            return result;
+        }
+
+        SSSP_FORCE_INLINE std::string ToPrettyBytes(u64 bytes)
+        {
+            static auto convlam = [](const auto a_value, const i32 n) 
+                {
+                std::ostringstream out;
+                out << std::fixed << std::setprecision(n) << a_value;
+                return out.str();
+                };
+
+            const c8* suffixes[7];
+            suffixes[0] = " B";
+            suffixes[1] = " KB";
+            suffixes[2] = " MB";
+            suffixes[3] = " GB";
+            suffixes[4] = " TB";
+            suffixes[5] = " PB";
+            suffixes[6] = " EB";
+            u32 s = 0; // which suffix to use
+            auto count = static_cast<f64>(bytes);
+            while (count >= 1024 && s < 7) 
+            {
+                s++;
+                count /= 1024;
+            }
+            if (count - floor(count) == 0.0)
+                return std::to_string((int)count) + suffixes[s];
+            else
+                return convlam(count, 2) + suffixes[s];
         }
 	}
 }

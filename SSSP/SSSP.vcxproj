@@ -84,6 +84,7 @@
     <CudaCompile Include="Utils\Args.cu" />
     <CudaCompile Include="Utils\Graph.cu" />
     <CudaCompile Include="Utils\Logger.cu" />
+    <CudaCompile Include="Utils\Memory.cu" />
     <CudaCompile Include="Utils\Print.cu" />
   </ItemGroup>
   <ItemGroup>
@@ -107,7 +108,6 @@
     <ClInclude Include="Utils\Args.cuh" />
     <ClInclude Include="Utils\DataGenerator.cuh" />
     <ClInclude Include="Utils\Debug.cuh" />
-    <ClInclude Include="Utils\Exception.cuh" />
     <ClInclude Include="Utils\Graph.cuh" />
     <ClInclude Include="Utils\File.cuh" />
     <ClInclude Include="Utils\Logger.cuh" />

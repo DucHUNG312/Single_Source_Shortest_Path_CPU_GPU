@@ -2,13 +2,14 @@
 
 #include <Core/Core.cuh>
 #include <Utils/Graph.cuh>
-#include <Utils/Memory.cuh>
 #include <omp.h>
 
 namespace SSSP
 {
     SSSP_FORCE_INLINE u32* SSSP_CPU_Serial(Graph* graph, i32 source, const Options& options)
     {
+        SSSP_PROFILE_FUNCTION();
+
         i32 numNodes = graph->numNodes;
         i32 numEdges = graph->numEdges;
 
@@ -62,18 +63,20 @@ namespace SSSP
                 {
                     dist[end] = dist[source] + weight;
                     preNode[end] = source;
-                    //graphChanged = true;
+                    finished = false;
                 }
             }
         }
-
-        SSSP_LOG_DEBUG_NL("CPU Serial Process Done!");
 
         Allocator<u32>::DeallocateHostMemory(preNode);
         Allocator<u32>::DeallocateHostMemory(edgesSource);
         Allocator<u32>::DeallocateHostMemory(edgesEnd);
         Allocator<u32>::DeallocateHostMemory(edgesWeight);
 
+        SSSP_MEMORY_TRACKING;
+
+        SSSP_LOG_DEBUG("CPU");
+ 
         return dist;
     }
 
@@ -99,18 +102,18 @@ namespace SSSP
         }
 
 #pragma omp parallel for shared(dist, preNode, edgesSource, edgesEnd, edgesWeight) default(none) schedule(static)
-        for (i32 i = 0; i < numEdges; i++) 
+        for (i32 i = 0; i < numEdges; i++)
         {
             Edge edge = graph->edges.at(i);
             edgesSource[i] = edge.source;
             edgesEnd[i] = edge.end;
             edgesWeight[i] = edge.weight;
 
-            if (edge.source == source && edge.weight < dist[edge.end]) 
+            if (edge.source == source && edge.weight < dist[edge.end])
             {
 #pragma omp critical
                 {
-                    if (edge.weight < dist[edge.end]) 
+                    if (edge.weight < dist[edge.end])
                     {
                         dist[edge.end] = edge.weight;
                         preNode[edge.end] = source;
@@ -122,6 +125,7 @@ namespace SSSP
         dist[source] = 0;
         preNode[source] = 0;
         bool finished = false;
+        SSSP_PROFILE_FUNCTION();
         while (!finished)
         {
             finished = true;
@@ -140,7 +144,7 @@ namespace SSSP
                     end = numEdges;
                 }
 
-#pragma omp parallel for shared(dist, preNode) default(none) schedule(static)
+#pragma omp parallel for shared(dist, preNode, finished) default(none) schedule(static)
                 for (i32 i = 0; i < numEdges; i++)
                 {        
                     u32 src = edgesSource[i];
@@ -157,19 +161,22 @@ namespace SSSP
                             {
                                 dist[end] = newDist;
                                 preNode[end] = src;
+                                finished = false;
                             }
                         }
                     }
                 }
             }
         }
-       
-        SSSP_LOG_DEBUG_NL("OpenMP ({} threads) Process Done!", numThreads);
 
         Allocator<u32>::DeallocateHostMemory(preNode);
         Allocator<u32>::DeallocateHostMemory(edgesSource);
         Allocator<u32>::DeallocateHostMemory(edgesEnd);
         Allocator<u32>::DeallocateHostMemory(edgesWeight);
+
+        SSSP_MEMORY_TRACKING;
+
+        SSSP_LOG_DEBUG("CPU OpenMP ({} threads)", numThreads);
 
         return dist;
     }

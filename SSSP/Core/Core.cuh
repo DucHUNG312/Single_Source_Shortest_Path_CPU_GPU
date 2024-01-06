@@ -3,6 +3,7 @@
 #include <Core/Common.cuh>
 
 #define SSSP_DEBUG_BUILD
+#define SSSP_DEBUG 0
 
 #ifndef SSSP_BUILD_GPU_PATH
 #define SSSP_BUILD_GPU_PATH
@@ -233,6 +234,25 @@
 #define SSSP_CONCAT(x, y) SSSP_CONCAT_HELPER(x, y)
 #endif // SSSP_SSSP_CONCAT
 
+#ifndef SSSP_MEM_LIMIT_MB
+#define SSSP_MEM_LIMIT_MB 32
+#endif
+
+namespace SSSP
+{
+    SSSP_FORCE_INLINE void CheckCuda(cudaError_t result, c8 const* const func, const c8* const file, i32 const line)
+    {
+        if (result != cudaSuccess)
+        {
+            SSSP_LOG_CRITICAL_NL("Cuda error {}, {}, at {}: {}.{}", result, cudaGetErrorString(result), file, line, func);
+            // Make sure we call CUDA Device Reset before exiting
+            cudaDeviceReset();
+            exit(99);
+        }
+    }
+}
+
+#define CHECK_CUDA_ERROR(val) ::SSSP::CheckCuda( (val), #val, __FILE__, __LINE__ )
 
 #if SSSP_PROFILE_ENABLED
 #include <Utils/Instrumentor.cuh>
@@ -257,9 +277,8 @@
         ::SSSP::InstrumentationTimer timer_##__COUNTER__(name);                                                                     \
         unique_counter_##__COUNTER__++;                                                                                             \
         func;                                                                                                                       \
-        timer_##__COUNTER__.PrintTimer(name);                                                                                       \
     } while(0)                           
-        
+
 #else
 #define SSSP_PROFILE_BEGIN_SESSION(name, filepath) EMPTY_PROFILE
 #define SSSP_PROFILE_END_SESSION() EMPTY_PROFILE
@@ -273,7 +292,7 @@ SSSP_PROFILE_PRINT_FUNCTION(name, func) EMPTY_PROFILE
 #define SSSP_PRINT_OPTIONS(options) ::SSSP::Debug::PrintOptions(options)
 #define SSSP_PRINT_DIST(dist, size) ::SSSP::Debug::PrintDist(dist, size)
 #define SSSP_PRINT_PRENODE(preNode, size) ::SSSP::Debug::PrintPreNode(preNode, size)
-#define SSSP_COMPARE_RESULT(dist1, dist2, numNodes) ::SSSP::Debug::CompareResult(dist1, dist2, numNodes)
+#define SSSP_COMPARE_RESULT(dist1, dist2, dist3, numNodes) ::SSSP::Debug::CompareResult(dist1, dist2, dist3, numNodes)
 
 // Math utils
 #include <Utils/Numeric.cuh>
@@ -328,5 +347,14 @@ namespace SSSP
 }
 #define SSSP_UNUSED_VARIABLE(var) ::SSSP::Internal::ignore_unused_variable(var);
 #define SSSP_ARRAYSIZE(array) (sizeof(::SSSP::Internal::ArraySizeHelper(array)))
+
+#include <Utils/Memory.cuh>
+#ifndef SSSP_MEMORY_TRACKING
+#define SSSP_MEMORY_TRACKING                                                                                                        \
+auto memusage = ::SSSP::CPUMemMonitor::GetMemoryUsage();                                                                            \
+SSSP_LOG_DEBUG_NL("Physical Process Memory Usage: {}", ::SSSP::Debug::ToPrettyBytes(memusage.PhysicalProcessUsed));                 \
+SSSP_LOG_DEBUG_NL("Virtual Process Memory Usage: {}",  ::SSSP::Debug::ToPrettyBytes(memusage.VirtualProcessUsed))
+#endif // !SSSP_MEMORY_TRACKING
+
 
 

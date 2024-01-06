@@ -2,33 +2,19 @@
 
 #include <Core/Core.cuh>
 #include <Utils/Graph.cuh>
-#include <Utils/Memory.cuh>
 #include <omp.h>
 
 namespace SSSP
 {
-    SSSP_GLOBAL void UpdateEdgesKernel(i32 numEdges, i32 numEdgesPerThread, u32* dist, u32* preNode, u32* edgesSource, u32* edgesEnd, u32* edgesWeight, bool* finished)
+    SSSP_GLOBAL void UpdateEdgesKernel(i32 numEdges, u32* dist, u32* preNode, u32* edgesSource, u32* edgesEnd, u32* edgesWeight, bool* finished)
     {
         i32 threadId = blockIdx.x * blockDim.x + threadIdx.x;
-        i32 startId = threadId * numEdgesPerThread;
 
-        if (startId >= numEdges)
+        if (threadId >= 0 && threadId <= numEdges)
         {
-            return;
-        }
-
-        i32 endId = (threadId + 1) * numEdgesPerThread;
-
-        if (endId >= numEdges)
-        {
-            endId = numEdges;
-        }
-
-        for (i32 nodeId = startId; nodeId < endId; nodeId++)
-        {
-            u32 source = edgesSource[nodeId];
-            u32 end = edgesEnd[nodeId];
-            u32 weight = edgesWeight[nodeId];
+            u32 source = edgesSource[threadId];
+            u32 end = edgesEnd[threadId];
+            u32 weight = edgesWeight[threadId];
 
             if (dist[source] + weight < dist[end])
             {
@@ -100,16 +86,17 @@ namespace SSSP
         Allocator<u32>::CopyHostToDevice(d_edgesEnd, edgesEnd, numEdges);
         Allocator<u32>::CopyHostToDevice(d_edgesWeight, edgesWeight, numEdges);
 
-        i32 numEdgesPerThread = 8;
         i32 numThreadsPerBlock = 512;
-        i32 numBlock = (numEdges) / (numThreadsPerBlock * numEdgesPerThread) + 1;
+        i32 numBlock = (numEdges) / (numThreadsPerBlock) + 1;
 
+        SSSP_PROFILE_FUNCTION();
         do
         {
             finished = true;
             Allocator<bool>::CopyHostToDevice(d_finished, &finished, 1);
 
-            UpdateEdgesKernel << <numBlock, numThreadsPerBlock >> > (numEdges, numEdgesPerThread, d_dist, d_preNode, d_edgesSource, d_edgesEnd, d_edgesWeight, d_finished);
+            UpdateEdgesKernel <<<numBlock, numThreadsPerBlock >>> (numEdges, d_dist, d_preNode, d_edgesSource, d_edgesEnd, d_edgesWeight, d_finished);
+
             CHECK_CUDA_ERROR(cudaPeekAtLastError());
             CHECK_CUDA_ERROR(cudaDeviceSynchronize());
             Allocator<bool>::CopyDeviceToHost(&finished, d_finished, 1);
@@ -117,8 +104,6 @@ namespace SSSP
 
         // Copy result from GPU to CPU
         Allocator<u32>::CopyDeviceToHost(dist, d_dist, numNodes);
-
-        SSSP_LOG_DEBUG_NL("GPU Process Done!");
 
         // dealoccate on GPU
         Allocator<u32>::DeallocateDeviceMemory(d_dist);
@@ -133,6 +118,10 @@ namespace SSSP
         Allocator<u32>::DeallocateHostMemory(edgesSource);
         Allocator<u32>::DeallocateHostMemory(edgesEnd);
         Allocator<u32>::DeallocateHostMemory(edgesWeight);
+
+        SSSP_MEMORY_TRACKING;
+
+        SSSP_LOG_DEBUG("GPU");
 
         return dist;
     }

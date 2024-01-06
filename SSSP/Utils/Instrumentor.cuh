@@ -150,6 +150,7 @@ namespace SSSP
         {
             Update();
             Instrumentor::Get().WriteProfile({ name, highResStart, elapsedTime, std::this_thread::get_id() });
+            SSSP_LOG_DEBUG_NL(" took {} ms.", elapsedTime.count() / 1000);
             stopped = true;
         }
     private:

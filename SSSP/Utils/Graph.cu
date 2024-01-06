@@ -1,4 +1,5 @@
 #include <Utils/Graph.cuh>
+#include <omp.h>
 
 namespace SSSP
 {
@@ -18,63 +19,47 @@ namespace SSSP
 		u32 edgeCounter = 0;
 		u32 maxNodeNumber = 0;
 		u32 minNodeNumber = MAX_DIST;
-
 		Edge newEdge;
+        
+        while (getline(infile, line)) 
+        {
+#pragma omp parallel private(line) reduction(+:edgeCounter) reduction(max:maxNodeNumber) reduction(min:minNodeNumber) reduction(||:hasZero)
+            {
+#pragma omp for
+                for (i32 i = 0; i < 1; i++)
+                {
+                    // Each thread reads a line
+#pragma omp critical
+                    {
+                        if (!line.empty() && isdigit(line[0]))
+                        {
+                            ss.clear();
+                            ss << line;
 
-		while (getline(infile, line)) 
-		{
-			// ignore non graph data
-			if (line[0] < '0' || line[0] >'9') 
-			{
-				continue;
-			}
+                            ss >> newEdge.source; 
+                            ss >> newEdge.end;
 
-			// stringstream ss(line);
-			ss.clear();
-			ss << line;
-			edgeCounter++;
+                            if (ss >> newEdge.weight)
+                            {
+                                // TODO: load weight
+                            }
+                            else
+                            {
+                                newEdge.weight = 1;
+                            }
 
+                            hasZero = hasZero || (newEdge.source == 0 || newEdge.end == 0);
 
-			ss >> newEdge.source;
-			ss >> newEdge.end;
+                            maxNodeNumber = std::max({ maxNodeNumber, newEdge.source, newEdge.end });
+                            minNodeNumber = std::min({ minNodeNumber, newEdge.source, newEdge.end });
 
-			if (ss >> newEdge.weight) 
-			{
-				// load weight 
-			}
-			else 
-			{
-				// load default weight
-				newEdge.weight = 1;
-			}
-
-			// graph[start][end] = weight;
-			if (newEdge.source == 0 || newEdge.end == 0)
-			{
-				hasZero = true;
-			}
-
-			if (maxNodeNumber < newEdge.source) 
-			{
-				maxNodeNumber = newEdge.source;
-			}
-			if (maxNodeNumber < newEdge.end) 
-			{
-				maxNodeNumber = newEdge.end;
-			}
-			if (minNodeNumber > newEdge.source) 
-			{
-				minNodeNumber = newEdge.source;
-			}
-			if (minNodeNumber > newEdge.end) 
-			{
-				minNodeNumber = newEdge.source;
-			}
-
-
-			edges.push_back(newEdge);
-
-		}
+                            edges.push_back(newEdge);
+                            edgeCounter++;
+                        }
+                    }
+                }
+            }
+        }
 
 		infile.close();
 
@@ -86,7 +71,7 @@ namespace SSSP
 		numEdges = edgeCounter;
 		defaultSource = minNodeNumber;
 
-		SSSP_LOG_DEBUG_NL("Read graph from {}. This graph contains {} nodes, and {} edges.", graphFilePath, numNodes, numEdges);
+		SSSP_LOG_DEBUG("Read graph from {}. This graph contains {} nodes, and {} edges,", graphFilePath, numNodes, numEdges);
     }
 
     void Graph::PrintGraph()

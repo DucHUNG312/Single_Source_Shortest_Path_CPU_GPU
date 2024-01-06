@@ -67,7 +67,7 @@ namespace SSSP
 				std::ofstream existingFile(filePath, std::ios::trunc); // Open existing file and clear content
 				if (existingFile.is_open())
 				{
-#ifdef SSSP_DEBUG
+#if SSSP_DEBUG
 					std::cout << "Cleard existing file content and write: " << filePath << std::endl;
 #endif //SSSP_DEBUG
 					existingFile.close();
