@@ -15,15 +15,23 @@ void RunSSSP(const std::string& dataSetName, const Options& options)
     SSSP_PROFILE_PRINT_FUNCTION(("Load" + dataSetName).c_str(), graph.ReadGraph());
     i32 sourceNode = graph.defaultSource;
     SSSP_LOG_DEBUG_NL();
+    
     u32* CPUSerial = SSSP_CPU_Serial(&graph, sourceNode, options);
     SSSP_LOG_DEBUG_NL();
-    u32* CPUParallel = SSSP_CPU_Parallel(&graph, sourceNode, options);
-    SSSP_LOG_DEBUG_NL();
+
+    //u32* CPUParallel = SSSP_CPU_Parallel(&graph, sourceNode, options);
+    //SSSP_LOG_DEBUG_NL();
+    
+
     u32* GPUCUDA = SSSP_GPU_CUDA(&graph, sourceNode, options);
-    SSSP_COMPARE_RESULT(CPUParallel, GPUCUDA, CPUSerial, graph.numNodes);
+    //Debug::PrintDist(GPUCUDA, graph.numNodes);
+    SSSP_LOG_DEBUG_NL();
+    
+    //SSSP_COMPARE_RESULT(CPUParallel, GPUCUDA, CPUSerial, graph.numNodes);
     Allocator<u32>::DeallocateHostMemory(GPUCUDA);
     Allocator<u32>::DeallocateHostMemory(CPUSerial);
-    Allocator<u32>::DeallocateHostMemory(CPUParallel);
+    //Allocator<u32>::DeallocateHostMemory(CPUParallel);
+
     SSSP_LOG_INFO_NL();
 }
 
@@ -42,19 +50,21 @@ i32 main(i32 argc, c8** argv)
     SSSP_PRINT_OPTIONS(options);
 #endif // SSSP_DEBUG
 
+    /// This is DAG, only 1 direction !!!
+
     SSSP_PROFILE_BEGIN_SESSION("SSSP", chromeTracingFile);
 
-    RunSSSP("simple", options);
-    RunSSSP("Gnutella08", options);
-    RunSSSP("Gnutella04", options);
-    RunSSSP("Gnutella30", options);
-    RunSSSP("EmailEuAll", options);
+    //RunSSSP("simple", options);
+    //RunSSSP("Gnutella08", options);
+    //RunSSSP("Gnutella04", options);
+    //RunSSSP("Gnutella30", options);
+    //RunSSSP("EmailEuAll", options);
     RunSSSP("Slashdot0811", options);
-    RunSSSP("Slashdot0902", options);
-    RunSSSP("Amazon0601", options);
-    RunSSSP("WikiTalk", options);
-    RunSSSP("webGoogle", options);
-    RunSSSP("wikiTopcats", options);
+    //RunSSSP("Slashdot0902", options);
+    //RunSSSP("Amazon0601", options);
+    //RunSSSP("WikiTalk", options);
+    //RunSSSP("webGoogle", options);
+    //RunSSSP("wikiTopcats", options);
     //RunSSSP("socLiveJournal1", options);
     
     SSSP_PROFILE_END_SESSION();

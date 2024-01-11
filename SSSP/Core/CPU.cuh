@@ -47,8 +47,10 @@ namespace SSSP
         preNode[source] = 0;
         bool finished = false;
         //bool graphChanged = true;
+        i32 count = 0;
         while (!finished)
         {
+            count++;
             finished = true;
 
             for (i32 i = 0; i < numEdges; i++) 
@@ -66,7 +68,10 @@ namespace SSSP
                     finished = false;
                 }
             }
+
         }
+
+        SSSP_LOG_DEBUG_NL("CPU {}", count);
 
         Allocator<u32>::DeallocateHostMemory(preNode);
         Allocator<u32>::DeallocateHostMemory(edgesSource);

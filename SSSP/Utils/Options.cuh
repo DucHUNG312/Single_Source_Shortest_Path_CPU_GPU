@@ -14,6 +14,7 @@ namespace SSSP
 		bool hybrid = false;
 		i32 numThreadOpenMP = 8;
 		std::string dataFile = s_RootPath + "DataSets\\testGraph.txt"; 
+		std::string clKernelFile = s_RootPath + "CLKernel\\kernel.cl";
 		std::string chromeTracingFile = s_RootPath + "SSSP\\SSSP.json";
 	};
 }

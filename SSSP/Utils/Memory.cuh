@@ -48,12 +48,6 @@ namespace SSSP
 			CHECK_CUDA_ERROR(cudaFree(p));
 		}
 
-		static void AllocateMemoryIfNotAllocated(std::size_t n)
-		{
-			AllocateHostMemory(n);
-			AllocateDeviceMemory(n);
-		}
-
 		static void CopyHostToDevice(T* dataDevice, T* dataHost, std::size_t n)
 		{
 			CHECK_CUDA_ERROR(cudaMemcpy(dataDevice, dataHost, n * sizeof(T), cudaMemcpyHostToDevice));

@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)SSSP\ThirdParty\spdlog\include;$(SolutionDir)SSSP;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)SSSP\ThirdParty\spdlog\include;$(SolutionDir)SSSP;$(SolutionDir)SSSP\ThirdParty\OpenCL;$(SolutionDir)SSSP\SSSP\External\OpenCL-Wrapper;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -54,7 +54,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;$(SolutionDir)SSSP\ThirdParty\OpenCL\lib\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
@@ -92,7 +92,6 @@
     <ClInclude Include="Core\Core.cuh" />
     <ClInclude Include="Core\CPU.cuh" />
     <ClInclude Include="Core\GPU.cuh" />
-    <ClInclude Include="Core\Hybrid.cuh" />
     <ClInclude Include="External\double-conversion\bignum-dtoa.h" />
     <ClInclude Include="External\double-conversion\bignum.h" />
     <ClInclude Include="External\double-conversion\cached-powers.h" />
@@ -105,6 +104,9 @@
     <ClInclude Include="External\double-conversion\string-to-double.h" />
     <ClInclude Include="External\double-conversion\strtod.h" />
     <ClInclude Include="External\double-conversion\utils.h" />
+    <ClInclude Include="External\OpenCL-Wrapper\kernel.hpp" />
+    <ClInclude Include="External\OpenCL-Wrapper\opencl.hpp" />
+    <ClInclude Include="External\OpenCL-Wrapper\utilities.hpp" />
     <ClInclude Include="Utils\Args.cuh" />
     <ClInclude Include="Utils\DataGenerator.cuh" />
     <ClInclude Include="Utils\Debug.cuh" />
@@ -129,6 +131,7 @@
     <ClCompile Include="External\double-conversion\fixed-dtoa.cc" />
     <ClCompile Include="External\double-conversion\string-to-double.cc" />
     <ClCompile Include="External\double-conversion\strtod.cc" />
+    <ClCompile Include="External\OpenCL-Wrapper\kernel.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <External/OpenCL-Wrapper/opencl.hpp>
+
 #include <Core/Core.cuh>
 #include <Utils/Graph.cuh>
 #include <omp.h>
@@ -10,7 +12,7 @@ namespace SSSP
     {
         i32 threadId = blockIdx.x * blockDim.x + threadIdx.x;
 
-        if (threadId >= 0 && threadId <= numEdges)
+        if (threadId < numEdges)
         {
             u32 source = edgesSource[threadId];
             u32 end = edgesEnd[threadId];
@@ -18,7 +20,8 @@ namespace SSSP
 
             if (dist[source] + weight < dist[end])
             {
-                atomicMin(&dist[end], dist[source] + weight);
+                //atomiccl_min(&dist[end], dist[source] + weight);
+                dist[end] = dist[source] + weight;
                 preNode[end] = source;
                 *finished = false;
             }
@@ -90,8 +93,10 @@ namespace SSSP
         i32 numBlock = (numEdges) / (numThreadsPerBlock) + 1;
 
         SSSP_PROFILE_FUNCTION();
+        i32 count = 0;
         do
         {
+            count++;
             finished = true;
             Allocator<bool>::CopyHostToDevice(d_finished, &finished, 1);
 
@@ -101,6 +106,8 @@ namespace SSSP
             CHECK_CUDA_ERROR(cudaDeviceSynchronize());
             Allocator<bool>::CopyDeviceToHost(&finished, d_finished, 1);
         } while (!finished);
+
+        SSSP_LOG_DEBUG_NL("GPU {}", count);
 
         // Copy result from GPU to CPU
         Allocator<u32>::CopyDeviceToHost(dist, d_dist, numNodes);
@@ -125,4 +132,81 @@ namespace SSSP
 
         return dist;
     }
+
+    /// TODO: Fix OpenCL Path
+    /*
+    SSSP_FORCE_INLINE u32* SSSP_GPU_CL(Graph* graph, i32 source, const Options& options)
+    {
+        i32 numNodes = graph->numNodes;
+        i32 numEdges = graph->numEdges;
+
+        Device device(select_device_with_most_flops()); // compile OpenCL C code for the fastest available device
+
+        // Allocate on both CPU and GPU
+        Memory<u32> dist(device, numNodes);
+        Memory<u32> preNode(device, numNodes);
+        Memory<u32> edgesSource(device, numEdges);
+        Memory<u32> edgesEnd(device, numEdges);
+        Memory<u32> edgesWeight(device, numEdges);
+        Memory<u32> finished(device, 1);
+
+        i32 numThreads = options.numThreadOpenMP;
+        omp_set_num_threads(numThreads);
+
+#pragma omp parallel for shared(dist, preNode) default(none) schedule(static)
+        for (i32 i = 0; i < numNodes; i++)
+        {
+            dist[i] = MAX_DIST;
+            preNode[i] = u32(-1);
+        }
+
+#pragma omp parallel for shared(dist, preNode, edgesSource, edgesEnd, edgesWeight) default(none) schedule(static)
+        for (i32 i = 0; i < numEdges; i++)
+        {
+            Edge edge = graph->edges.at(i);
+            edgesSource[i] = edge.source;
+            edgesEnd[i] = edge.end;
+            edgesWeight[i] = edge.weight;
+
+            if (edge.source == source && edge.weight < dist[edge.end])
+            {
+#pragma omp critical
+                {
+                    if (edge.weight < dist[edge.end])
+                    {
+                        dist[edge.end] = edge.weight;
+                        preNode[edge.end] = source;
+                    }
+                }
+            }
+        }
+        dist[source] = 0;
+        preNode[source] = 0;
+        finished[0] = 0;
+
+        dist.write_to_device();
+        preNode.write_to_device();
+        edgesSource.write_to_device();
+        edgesEnd.write_to_device();
+        edgesWeight.write_to_device();
+
+        Kernel UpdateEdgesKernelCL(device, numNodes, "UpdateEdgesKernelCL", dist.data(), preNode.data(), edgesSource.data(), edgesEnd.data(), edgesWeight.data(), finished.data(), numEdges);
+
+        do 
+        {
+            finished.write_to_device();
+
+            // Kernel
+            UpdateEdgesKernelCL.run();
+
+            finished.read_from_device();
+        } while (!finished[0]);
+
+        // copy data from host memory to device memory
+       
+        dist.read_from_device();
+
+        return dist.data();
+    }
+    */
 }

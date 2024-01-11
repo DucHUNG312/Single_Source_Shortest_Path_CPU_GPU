@@ -32,16 +32,17 @@ namespace SSSP
             }
         }
 
-        SSSP_FORCE_INLINE void CompareResult(u32* dist1, u32* dist2, u32* dist3, u32 numNodes) 
+    
+        SSSP_FORCE_INLINE void CompareResult(u32* dist1, u32* dist2, u32* dist3, u32 numNodes)
         {
             u32 diffCount = 0;
             u32 diffCount2 = 0;
             std::vector<i32> nodesId;
             std::vector<i32> nodesId2;
 
-            for (i32 i = 0; i < numNodes; i++) 
+            for (i32 i = 0; i < numNodes; i++)
             {
-                if (dist1[i] != dist2[i]) 
+                if (dist1[i] != dist2[i])
                 {
                     diffCount++;
                     nodesId.push_back(i);
@@ -66,7 +67,7 @@ namespace SSSP
                 }
 #endif // SSSP_DEBUG
             }
-            else 
+            else
             {
                 SSSP_LOG_ERROR_NL("(dist 1, dist 2): {} does not match: ", diffCount);
                 SSSP_LOG_ERROR_NL("(dist 1, dist 3): {} does not match: ", diffCount2);

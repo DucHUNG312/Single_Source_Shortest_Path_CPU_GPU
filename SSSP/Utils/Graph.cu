@@ -61,6 +61,10 @@ namespace SSSP
             }
         }
 
+#ifdef DEBUG
+        SSSP_LOG_DEBUG_NL(ss.str());
+#endif // DEBUG
+
 		infile.close();
 
 		if (hasZero) 
@@ -69,7 +73,8 @@ namespace SSSP
 		}
 		numNodes = maxNodeNumber;
 		numEdges = edgeCounter;
-		defaultSource = minNodeNumber;
+		//defaultSource = minNodeNumber;
+        defaultSource = 1;
 
 		SSSP_LOG_DEBUG("Read graph from {}. This graph contains {} nodes, and {} edges,", graphFilePath, numNodes, numEdges);
     }

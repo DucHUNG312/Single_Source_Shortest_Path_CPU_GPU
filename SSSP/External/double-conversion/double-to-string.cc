@@ -113,7 +113,7 @@ void DoubleToStringConverter::CreateExponentialRepresentation(
       exponent /= 10;
     }
   }
-  // Add prefix '0' to make exponent width >= min(min_exponent_with_, kMaxExponentLength)
+  // Add prefix '0' to make exponent width >= cl_min(min_exponent_with_, kMaxExponentLength)
   // For example: convert 1e+9 -> 1e+09, if min_exponent_with_ is set to 2
   while(kMaxExponentLength - first_char_pos < std::min(min_exponent_width_, kMaxExponentLength)) {
     buffer[--first_char_pos] = '0';
